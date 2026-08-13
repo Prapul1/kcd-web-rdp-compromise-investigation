@@ -1,0 +1,17 @@
+`` Step 3: Classify Event 4624 successful logons by Logon Type, isolate RDP (Type 10) ``
+source="KCD_Investigation.csv" EventCode=4624 Logon_Type!=5 Logon_Type=10
+| eval Logon_Type_Desc=case(
+    LogonType==2,  "Interactive (Console)",
+    LogonType==3,  "Network (Share/SMB)",
+    LogonType==4,  "Batch (Scheduled Task)",
+    LogonType==5,  "Service Startup",
+    LogonType==7,  "Workstation Unlock",
+    LogonType==8,  "Network Cleartext",
+    LogonType==9,  "NewCredentials (RunAs/PtH)",
+    LogonType==10, "Remote Interactive (RDP)",
+    LogonType==11, "Cached Interactive",
+    true(), "Other (" . LogonType . ")"
+  )
+| rename TargetUserName as user, Source_Network_Address as src_ip, Computer as dest
+| table _time, user, src_ip, dest, Logon_Type_Desc, TargetLogonId
+| sort - _time

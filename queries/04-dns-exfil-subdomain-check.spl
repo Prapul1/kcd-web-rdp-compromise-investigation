@@ -1,0 +1,9 @@
+`` Step 8: Rule out DNS-based C2 / exfiltration via subdomain fan-out analysis ``
+source="KCD_Investigation.csv" (EventCode=22 OR event_id=22) ProcessID="'3204'"
+| rex field=QueryName "(?<parent_domain>[^.]+\.[^.]+$)"
+| stats count dc(QueryName) as Unique_Subdomains values(Image) as Executables by parent_domain
+| where Unique_Subdomains > 10
+| sort - Unique_Subdomains
+| search Image="*systemsvc.exe*" OR Image="*cmd.exe*" OR Image="*powershell.exe*"
+| table _time, Image, QueryName, QueryResults
+| sort - _time

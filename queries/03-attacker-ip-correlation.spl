@@ -1,0 +1,4 @@
+`` Step 5: Correlate all activity tied to the confirmed attacker IP ``
+source="KCD_Investigation.csv" "194.41.112.79"
+| table _time, EventCode, TargetUserName, process_name, action, status
+| sort _time
